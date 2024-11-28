@@ -209,7 +209,7 @@ const handleConfirm = ({ startTime, endTime }) => {
   console.log('接收到确认截取时间段:', { startTime, endTime });
   // 在这里处理确认的逻辑，比如发送请求、保存设置等
 
-  setEndTime(10); // 设置结束时间为 10 秒
+  //setEndTime(10); // 设置结束时间为 10 秒
 
 
   openVideoVisible.value = false; // 关闭对话框
