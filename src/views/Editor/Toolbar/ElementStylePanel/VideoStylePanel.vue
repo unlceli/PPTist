@@ -22,6 +22,7 @@
           @update:value="value => updateVideo({ autoplay: value })" 
         />
       </div>
+      
     </div>
   </div>
 </template>

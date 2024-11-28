@@ -49,6 +49,16 @@
       <FileInput @change="files => insertImageElement(files)">
         <IconPicture class="handler-item" v-tooltip="'插入图片'" />
       </FileInput>
+
+
+
+      <div class="handler-item group-btn" v-tooltip="'插入本地视频'">
+        <FileInput @change="files => insertVideoElement(files)"   accept="video/*" >
+          <IconVideoTwo class="icon" />
+        </FileInput>
+     </div>
+
+
       <Popover trigger="click" v-model:value="linePoolVisible" :offset="10">
         <template #content>
           <LinePool @select="line => drawLine(line)" />
@@ -171,6 +181,19 @@ const insertImageElement = (files: FileList) => {
   if (!imageFile) return
   getImageDataURL(imageFile).then(dataURL => createImageElement(dataURL))
 }
+
+const insertVideoElement = (files: FileList) => {
+  const videoFile = files[0]
+  if (!videoFile) return
+  
+  // 将视频文件转换为 URL 或者 Base64
+  const videoURL = URL.createObjectURL(videoFile)
+  console.log("videoURL"+videoURL);
+  createVideoElement(videoURL)
+}
+
+
+
 
 const shapePoolVisible = ref(false)
 const linePoolVisible = ref(false)

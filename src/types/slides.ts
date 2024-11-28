@@ -578,6 +578,10 @@ export interface PPTLatexElement extends PPTBaseElement {
  * poster: 预览封面
  * 
  * ext: 视频后缀，当资源链接缺少后缀时用该字段确认资源类型
+ * 
+ * startTtime: 开始时间
+ * 
+ *  endTime: 结束时间
  */
 export interface PPTVideoElement extends PPTBaseElement {
   type: 'video'
@@ -585,6 +589,8 @@ export interface PPTVideoElement extends PPTBaseElement {
   autoplay: boolean
   poster?: string
   ext?: string
+  startTtime?: number
+  endTime?: number
 }
 
 /**

@@ -12,7 +12,7 @@
       class="rotate-wrapper"
       :style="{ transform: `rotate(${elementInfo.rotate}deg)` }"
     >
-      <div 
+        <div 
         class="element-content" 
         v-contextmenu="contextmenus" 
         @mousedown="$event => handleSelectElement($event, false)"

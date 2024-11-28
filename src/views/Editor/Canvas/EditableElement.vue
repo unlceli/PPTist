@@ -47,6 +47,7 @@ const props = defineProps<{
   isMultiSelect: boolean
   selectElement: (e: MouseEvent | TouchEvent, element: PPTElement, canMove?: boolean) => void
   openLinkDialog: () => void
+  openVideoDialog: () => void
 }>()
 
 const currentElementComponent = computed<unknown>(() => {
@@ -79,7 +80,7 @@ const contextmenus = (): ContextmenuItem[] => {
       handler: () => unlockElement(props.elementInfo),
     }]
   }
-
+  console.log('props.elementInfo', props.elementInfo);
   return [
     {
       text: '剪切',
@@ -127,6 +128,8 @@ const contextmenus = (): ContextmenuItem[] => {
         { text: '上移一层', handler: () => orderElement(props.elementInfo, ElementOrderCommands.UP) },
       ],
     },
+
+
     {
       text: '置于底层',
       disable: props.isMultiSelect && !props.elementInfo.groupId,
@@ -141,6 +144,13 @@ const contextmenus = (): ContextmenuItem[] => {
       text: '设置链接',
       handler: props.openLinkDialog,
     },
+
+    {
+      text: '视频剪辑',
+      handler: props.openVideoDialog,
+      disable: props.elementInfo.type!== ElementTypes.VIDEO,
+    },
+
     {
       text: props.elementInfo.groupId ? '取消组合' : '组合',
       subText: 'Ctrl + G',

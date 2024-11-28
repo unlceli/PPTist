@@ -22,6 +22,7 @@ const props = defineProps<{
   elementInfo: PPTElement
   link: PPTElementLink
   openLinkDialog: () => void
+  openVideoDialog: () => void
 }>()
 
 const mainStore = useMainStore()

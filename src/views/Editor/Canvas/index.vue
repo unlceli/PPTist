@@ -1,85 +1,36 @@
 <template>
-  <div 
-    class="canvas" 
-    ref="canvasRef"
-    @wheel="$event => handleMousewheelCanvas($event)"
-    @mousedown="$event => handleClickBlankArea($event)"
-    @dblclick="$event => handleDblClick($event)"
-    v-contextmenu="contextmenus"
-    v-click-outside="removeEditorAreaFocus"
-  >
-    <ElementCreateSelection
-      v-if="creatingElement"
-      @created="data => insertElementFromCreateSelection(data)"
-    />
-    <ShapeCreateCanvas
-      v-if="creatingCustomShape"
-      @created="data => insertCustomShape(data)"
-    />
-    <div 
-      class="viewport-wrapper"
-      :style="{
-        width: viewportStyles.width * canvasScale + 'px',
-        height: viewportStyles.height * canvasScale + 'px',
-        left: viewportStyles.left + 'px',
-        top: viewportStyles.top + 'px',
-      }"
-    >
+  <div class="canvas" ref="canvasRef" @wheel="$event => handleMousewheelCanvas($event)"
+    @mousedown="$event => handleClickBlankArea($event)" @dblclick="$event => handleDblClick($event)"
+    v-contextmenu="contextmenus" v-click-outside="removeEditorAreaFocus">
+    <ElementCreateSelection v-if="creatingElement" @created="data => insertElementFromCreateSelection(data)" />
+    <ShapeCreateCanvas v-if="creatingCustomShape" @created="data => insertCustomShape(data)" />
+    <div class="viewport-wrapper" :style="{
+      width: viewportStyles.width * canvasScale + 'px',
+      height: viewportStyles.height * canvasScale + 'px',
+      left: viewportStyles.left + 'px',
+      top: viewportStyles.top + 'px',
+    }">
       <div class="operates">
-        <AlignmentLine 
-          v-for="(line, index) in alignmentLines" 
-          :key="index" 
-          :type="line.type" 
-          :axis="line.axis" 
-          :length="line.length"
-          :canvasScale="canvasScale"
-        />
-        <MultiSelectOperate 
-          v-if="activeElementIdList.length > 1"
-          :elementList="elementList"
-          :scaleMultiElement="scaleMultiElement"
-        />
-        <Operate
-          v-for="element in elementList" 
-          :key="element.id"
-          :elementInfo="element"
-          :isSelected="activeElementIdList.includes(element.id)"
-          :isActive="handleElementId === element.id"
-          :isActiveGroupElement="activeGroupElementId === element.id"
-          :isMultiSelect="activeElementIdList.length > 1"
-          :rotateElement="rotateElement"
-          :scaleElement="scaleElement"
-          :openLinkDialog="openLinkDialog"
-          :dragLineElement="dragLineElement"
-          :moveShapeKeypoint="moveShapeKeypoint"
-          v-show="!hiddenElementIdList.includes(element.id)"
-        />
+        <AlignmentLine v-for="(line, index) in alignmentLines" :key="index" :type="line.type" :axis="line.axis"
+          :length="line.length" :canvasScale="canvasScale" />
+        <MultiSelectOperate v-if="activeElementIdList.length > 1" :elementList="elementList"
+          :scaleMultiElement="scaleMultiElement" />
+        <Operate v-for="element in elementList" :key="element.id" :elementInfo="element"
+          :isSelected="activeElementIdList.includes(element.id)" :isActive="handleElementId === element.id"
+          :isActiveGroupElement="activeGroupElementId === element.id" :isMultiSelect="activeElementIdList.length > 1"
+          :rotateElement="rotateElement" :scaleElement="scaleElement" :openLinkDialog="openLinkDialog"
+          :openVideoDialog="openVideoDialog" :dragLineElement="dragLineElement" :moveShapeKeypoint="moveShapeKeypoint"
+          v-show="!hiddenElementIdList.includes(element.id)" />
         <ViewportBackground />
       </div>
 
-      <div 
-        class="viewport" 
-        ref="viewportRef"
-        :style="{ transform: `scale(${canvasScale})` }"
-      >
-        <MouseSelection 
-          v-if="mouseSelectionVisible"
-          :top="mouseSelection.top" 
-          :left="mouseSelection.left" 
-          :width="mouseSelection.width" 
-          :height="mouseSelection.height" 
-          :quadrant="mouseSelectionQuadrant"
-        />      
-        <EditableElement 
-          v-for="(element, index) in elementList" 
-          :key="element.id"
-          :elementInfo="element"
-          :elementIndex="index + 1"
-          :isMultiSelect="activeElementIdList.length > 1"
-          :selectElement="selectElement"
-          :openLinkDialog="openLinkDialog"
-          v-show="!hiddenElementIdList.includes(element.id)"
-        />
+      <div class="viewport" ref="viewportRef" :style="{ transform: `scale(${canvasScale})` }">
+        <MouseSelection v-if="mouseSelectionVisible" :top="mouseSelection.top" :left="mouseSelection.left"
+          :width="mouseSelection.width" :height="mouseSelection.height" :quadrant="mouseSelectionQuadrant" />
+        <EditableElement v-for="(element, index) in elementList" :key="element.id" :elementInfo="element"
+          :elementIndex="index + 1" :isMultiSelect="activeElementIdList.length > 1" :selectElement="selectElement"
+          :openLinkDialog="openLinkDialog" :openVideoDialog="openVideoDialog"
+          v-show="!hiddenElementIdList.includes(element.id)" />
       </div>
     </div>
 
@@ -87,11 +38,17 @@
 
     <Ruler :viewportStyles="viewportStyles" :elementList="elementList" v-if="showRuler" />
 
-    <Modal
-      v-model:visible="linkDialogVisible" 
-      :width="540"
-    >
+    <Modal v-model:visible="linkDialogVisible" :width="540">
       <LinkDialog @close="linkDialogVisible = false" />
+    </Modal>
+
+    <Modal v-model:visible="openVideoVisible" :width="540">
+      <!-- <VideoDialog  
+      :videoData="videoData"
+       @close="openVideoVisible = false" /> -->
+
+      <VideoDialog  :videoData="videoData" @close="openVideoVisible = false" @confirm="handleConfirm"
+        @cancel="handleCancel" />
     </Modal>
   </div>
 </template>
@@ -137,7 +94,21 @@ import ShapeCreateCanvas from './ShapeCreateCanvas.vue'
 import MultiSelectOperate from './Operate/MultiSelectOperate.vue'
 import Operate from './Operate/index.vue'
 import LinkDialog from './LinkDialog.vue'
+import VideoDialog from './VideoDialog.vue'
 import Modal from '@/components/Modal.vue'
+
+
+import VideoPlayer from '../../components/element/VideoElement/VideoPlayer/index.vue';
+
+const { videoRef, setEndTime } = VideoPlayer;
+
+
+
+
+const videoData = ref({
+  url: 'https://mazwai.com/videvo_files/video/free/2019-01/small_watermarked/181004_04_Dolphins-Whale_06_preview.webm', // 替换为实际视频地址
+});
+
 
 const mainStore = useMainStore()
 const {
@@ -161,6 +132,8 @@ const alignmentLines = ref<AlignmentLineProps[]>([])
 
 const linkDialogVisible = ref(false)
 const openLinkDialog = () => linkDialogVisible.value = true
+const openVideoVisible = ref(false)
+const openVideoDialog = () => openVideoVisible.value = true
 
 watch(handleElementId, () => {
   mainStore.setActiveGroupElementId('')
@@ -229,6 +202,25 @@ const handleDblClick = (e: MouseEvent) => {
     height: 0,
   })
 }
+
+
+
+const handleConfirm = ({ startTime, endTime }) => {
+  console.log('接收到确认截取时间段:', { startTime, endTime });
+  // 在这里处理确认的逻辑，比如发送请求、保存设置等
+
+  setEndTime(10); // 设置结束时间为 10 秒
+
+
+  openVideoVisible.value = false; // 关闭对话框
+};
+
+const handleCancel = () => {
+  console.log('取消截取操作');
+  openVideoVisible.value = false; // 关闭对话框
+};
+
+
 
 // 画布注销时清空格式刷状态
 onUnmounted(() => {
@@ -354,14 +346,17 @@ provide(injectKeySlideScale, canvasScale)
   background-color: $lightGray;
   position: relative;
 }
+
 .drag-mask {
   cursor: grab;
   @include absolute-0();
 }
+
 .viewport-wrapper {
   position: absolute;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.01), 0 0 12px 0 rgba(0, 0, 0, 0.1);
 }
+
 .viewport {
   position: absolute;
   top: 0;

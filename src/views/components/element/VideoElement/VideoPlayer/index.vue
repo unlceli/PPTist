@@ -179,15 +179,23 @@ const speedOptions = [
   { label: '0.5x', value: 0.5 },
 ]
 
+// const seek = (time: number) => {
+//   if (!videoRef.value) return
+
+//   time = Math.max(time, 0)
+//   time = Math.min(time, duration.value)
+
+//   videoRef.value.currentTime = time
+//   currentTime.value = time
+// }
+
 const seek = (time: number) => {
-  if (!videoRef.value) return
-
-  time = Math.max(time, 0)
-  time = Math.min(time, duration.value)
-
-  videoRef.value.currentTime = time
-  currentTime.value = time
-}
+  if (!videoRef.value) return;
+  time = Math.max(time, 0);
+  time = Math.min(time, duration.value);
+  videoRef.value.currentTime = time;
+  currentTime.value = time;
+};
 
 const play = () => {
   if (!videoRef.value) return
@@ -226,13 +234,33 @@ const speed = (rate: number) => {
   playbackRate.value = rate
 }
 
+const endTime = ref<number | null>(null); // 可选的结束时间
+
+const setEndTime = (time: number) => {
+
+  console.log('setEndTime', time);
+  if (time >= 0 && time <= duration.value) {
+    endTime.value = time;
+  }
+  play()
+};
+
+
 const handleDurationchange = () => {
   duration.value = videoRef.value?.duration || 0
 }
 
+// const handleTimeupdate = () => {
+//   currentTime.value = videoRef.value?.currentTime || 0
+// }
 const handleTimeupdate = () => {
-  currentTime.value = videoRef.value?.currentTime || 0
-}
+  currentTime.value = videoRef.value?.currentTime || 0;
+  if (endTime.value !== null && currentTime.value >= endTime.value) {
+    pause(); // 停止播放
+    seek(endTime.value); // 定位到结束时间
+  }
+};
+
 
 const handleEnded = () => {
   if (!loop.value) pause()
@@ -354,6 +382,15 @@ const autoHideController = () => {
 }
 
 useMSE(props.src, videoRef)
+
+
+// 暴露给父组件
+defineExpose({
+  videoRef,
+  setEndTime,
+});
+
+
 </script>
 
 <style scoped lang="scss">

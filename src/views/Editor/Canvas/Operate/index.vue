@@ -31,6 +31,7 @@
       :elementInfo="elementInfo" 
       :link="elementInfo.link"
       :openLinkDialog="openLinkDialog" 
+      :openVideoDialog="openVideoDialog"
       v-if="isActive && elementInfo.link" 
       @mousedown.stop=""
     />
@@ -71,6 +72,7 @@ const props = defineProps<{
   dragLineElement: (e: MouseEvent, element: PPTLineElement, command: OperateLineHandlers) => void
   moveShapeKeypoint: (e: MouseEvent, element: PPTShapeElement, index: number) => void
   openLinkDialog: () => void
+  openVideoDialog: () => void
 }>()
 
 const { canvasScale, toolbarState } = storeToRefs(useMainStore())
